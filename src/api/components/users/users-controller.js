@@ -31,11 +31,11 @@ async function getUsers(request, response, next) {
 
       let has_previous_page;
       let has_next_page;
+
       if (page_number == 1) {
-        has_previous_pages = false;
+        has_previous_page = false;
       } else {
-        has_previous_page;
-        s = true;
+        has_previous_page = true;
       }
       if (total_pages > page_number) {
         has_next_page = true;

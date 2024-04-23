@@ -1,5 +1,6 @@
 const usersService = require('./users-service');
 const { errorResponder, errorTypes } = require('../../../core/errors');
+const usersRoute = require('./users-route');
 
 /**
  * Handle get list of users request
@@ -10,7 +11,36 @@ const { errorResponder, errorTypes } = require('../../../core/errors');
  */
 async function getUsers(request, response, next) {
   try {
+    //jadiin integer
+    const page_number = parseInt(request.query.page_number);
+    const page_size = parseInt(request.query.page_size);
+
+    const output = {};
+
     const users = await usersService.getUsers();
+
+    //kalau ada page_number dan page_size di url maka:
+    if (page_number && page_size) {
+      //menentukan index awal dan akhir untuk dapat memilah
+      //mana yang nanti akan akan di tampilkan berdasarkan
+      //url
+      const indexAwal = (page_number - 1) * page_size;
+      const indexAkhir = page_number * page_size;
+
+      //hasil dari page_number dan page_size
+      const result = users.slice(indexAwal, indexAkhir);
+
+      return response.status(200).json({
+        page_number: page_number,
+        page_size: page_size,
+        // count:
+        // total_pages:
+        // has_previous_pages:
+        // has_next_page:
+        data: result,
+      });
+    }
+
     return response.status(200).json(users);
   } catch (error) {
     return next(error);

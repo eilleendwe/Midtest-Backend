@@ -1,6 +1,9 @@
 const usersService = require('./users-service');
 const { errorResponder, errorTypes } = require('../../../core/errors');
 
+//npm package filter-data
+const { filterData, searchType } = require('filter-data');
+const { query } = require('express');
 /**
  * Handle get list of users request
  * @param {object} request - Express request object
@@ -10,52 +13,13 @@ const { errorResponder, errorTypes } = require('../../../core/errors');
  */
 async function getUsers(request, response, next) {
   try {
-    //jadiin integer
-    const page_number = parseInt(request.query.page_number);
-    const page_size = parseInt(request.query.page_size);
+    //parseInt = jadiin integer
+    const page_number = parseInt(request.query.page_number) || 1;
+    //10 sebagai default apabila tidak ada input page_size
+    const page_size = parseInt(request.query.page_size) || 10;
+    const search = request.query.search;
 
-    const output = {};
-
-    const users = await usersService.getUsers();
-
-    //kalau ada page_number dan page_size di url maka:
-    if (page_number && page_size) {
-      //menentukan index awal dan akhir untuk dapat memilah
-      //mana yang nanti akan akan di tampilkan berdasarkan
-      //url
-      const indexAwal = (page_number - 1) * page_size;
-      const indexAkhir = page_number * page_size;
-
-      //pembulatan keatas.
-      const total_pages = Math.ceil(users.length / page_size);
-
-      let has_previous_page;
-      let has_next_page;
-
-      if (page_number == 1) {
-        has_previous_page = false;
-      } else {
-        has_previous_page = true;
-      }
-      if (total_pages > page_number) {
-        has_next_page = true;
-      } else {
-        has_next_page = false;
-      }
-
-      //hasil dari page_number dan page_size
-      const result = users.slice(indexAwal, indexAkhir);
-
-      return response.status(200).json({
-        page_number: page_number,
-        page_size: page_size,
-        count: result.length,
-        total_pages: total_pages,
-        has_previous_page: has_previous_page,
-        has_next_page: has_next_page,
-        data: result,
-      });
-    }
+    const users = await usersService.getUsers(page_number, page_size);
 
     return response.status(200).json(users);
   } catch (error) {

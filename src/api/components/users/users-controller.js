@@ -1,6 +1,8 @@
 const usersService = require('./users-service');
 const { errorResponder, errorTypes } = require('../../../core/errors');
 
+const { User } = require('../../../models');
+
 //npm package filter-data
 const { filterData, searchType } = require('filter-data');
 const { query } = require('express');
@@ -17,11 +19,38 @@ async function getUsers(request, response, next) {
     const page_number = parseInt(request.query.page_number) || 1;
     //10 sebagai default apabila tidak ada input page_size
     const page_size = parseInt(request.query.page_size) || 10;
-    const search = request.query.search;
+    // let search = request.query.search || 'hehe';
+    // let sort = request.query.sort || '';
 
-    const users = await usersService.getUsers(page_number, page_size);
+    const users = await usersService.getUsers();
 
-    return response.status(200).json(users);
+    //menentukan index awal dan akhir untuk dapat memilah
+    //mana yang nanti akan akan di tampilkan berdasarkan
+    //url
+    const indexAwal = (page_number - 1) * page_size;
+    const indexAkhir = page_number * page_size;
+
+    //pembulatan keatas.
+    const total_pages = Math.ceil(users.length / page_size);
+
+    // let has_next_page;
+    //kalau page_number diatas 1 maka has_previous_page = true
+    const has_previous_page = page_number > 1;
+    //kalau total_pages > page_number maka has_next_page = true
+    const has_next_page = total_pages > page_number;
+
+    //hasil dari page_number dan page_size
+    const result = users.slice(indexAwal, indexAkhir);
+
+    return response.status(200).json({
+      page_number: page_number,
+      page_size: page_size,
+      count: result.length,
+      total_pages: total_pages,
+      has_previous_page: has_previous_page,
+      has_next_page: has_next_page,
+      data: result,
+    });
   } catch (error) {
     return next(error);
   }

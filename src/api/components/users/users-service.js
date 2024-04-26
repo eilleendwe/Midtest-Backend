@@ -5,7 +5,7 @@ const { hashPassword, passwordMatched } = require('../../../utils/password');
  * Get list of users
  * @returns {Array}
  */
-async function getUsers(page_number, page_size) {
+async function getUsers() {
   const users = await usersRepository.getUsers();
 
   const results = [];
@@ -18,32 +18,7 @@ async function getUsers(page_number, page_size) {
     });
   }
 
-  //menentukan index awal dan akhir untuk dapat memilah
-  //mana yang nanti akan akan di tampilkan berdasarkan
-  //url
-  const indexAwal = (page_number - 1) * page_size;
-  const indexAkhir = page_number * page_size;
-
-  //pembulatan keatas.
-  const total_pages = Math.ceil(users.length / page_size);
-
-  //kalau page_number diatas 1 maka has_previous_page = true
-  const has_previous_page = page_number > 1;
-  //kalau total_pages > page_number maka has_next_page = true
-  const has_next_page = total_pages > page_number;
-
-  //hasil dari page_number dan page_size
-  const result = results.slice(indexAwal, indexAkhir);
-
-  return {
-    page_number: page_number,
-    page_size: page_size,
-    count: result.length,
-    total_pages: total_pages,
-    has_previous_page: has_previous_page,
-    has_next_page: has_next_page,
-    data: result,
-  };
+  return results;
 }
 
 /**

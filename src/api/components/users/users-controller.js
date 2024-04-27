@@ -1,11 +1,6 @@
 const usersService = require('./users-service');
 const { errorResponder, errorTypes } = require('../../../core/errors');
 
-const { User } = require('../../../models');
-
-//npm package filter-data
-const { filterData, searchType } = require('filter-data');
-const { query } = require('express');
 /**
  * Handle get list of users request
  * @param {object} request - Express request object
@@ -15,40 +10,67 @@ const { query } = require('express');
  */
 async function getUsers(request, response, next) {
   try {
-    //parseInt = jadiin integer
+    const totalUsers = await usersService.getUsers();
+
+    // nilai default kalau kosong = 1
     const page_number = parseInt(request.query.page_number) || 1;
-    //10 sebagai default apabila tidak ada input page_size
-    const page_size = parseInt(request.query.page_size) || 10;
-    // let search = request.query.search || 'hehe';
-    // let sort = request.query.sort || '';
+    // nilai default kalau kosong = 100
+    const page_size = parseInt(request.query.page_size) || totalUsers.length;
+    const search = request.query.search || '';
+    const sort = request.query.sort || '';
 
-    const users = await usersService.getUsers();
+    let searchField, searchKey;
+    if (search) {
+      const [field, key] = search.split(':');
+      searchField = field;
+      searchKey = key;
+    }
 
-    //menentukan index awal dan akhir untuk dapat memilah
-    //mana yang nanti akan akan di tampilkan berdasarkan
-    //url
+    let searchQuery = {};
+    if (searchField === 'email') {
+      searchQuery.email = { $regex: searchKey, $options: 'i' };
+    } else if (searchField === 'name') {
+      searchQuery.name = { $regex: searchKey, $options: 'i' };
+    }
+
+    let sortQuery = {};
+    if (sort) {
+      const [sortField, sortOrder] = sort.split(':');
+      if (sortOrder === 'desc') {
+        sortQuery[sortField] = -1;
+      } else {
+        sortQuery[sortField] = 1;
+      }
+    }
+
+    const users = await usersService.getUsersWithPagination(
+      searchQuery,
+      sortQuery,
+      page_number,
+      page_size
+    );
+
     const indexAwal = (page_number - 1) * page_size;
     const indexAkhir = page_number * page_size;
 
-    //pembulatan keatas.
+    //pembulatan keatas
     const total_pages = Math.ceil(users.length / page_size);
 
-    // let has_next_page;
     //kalau page_number diatas 1 maka has_previous_page = true
     const has_previous_page = page_number > 1;
     //kalau total_pages > page_number maka has_next_page = true
     const has_next_page = total_pages > page_number;
 
-    //hasil dari page_number dan page_size
     const result = users.slice(indexAwal, indexAkhir);
 
     return response.status(200).json({
+      // dataSearched: users.length,
       page_number: page_number,
       page_size: page_size,
-      count: result.length,
-      total_pages: total_pages,
+      count: totalUsers.length,
       has_previous_page: has_previous_page,
       has_next_page: has_next_page,
+      total_pages: total_pages,
       data: result,
     });
   } catch (error) {

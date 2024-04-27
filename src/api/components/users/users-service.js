@@ -5,6 +5,34 @@ const { hashPassword, passwordMatched } = require('../../../utils/password');
  * Get list of users
  * @returns {Array}
  */
+async function getUsersWithPagination(
+  searchQuery,
+  sortQuery,
+  page_number,
+  page_size
+) {
+  const users = await usersRepository.getUsersWithPagination(
+    searchQuery,
+    sortQuery,
+    page_number,
+    page_size
+  );
+
+  const results = [];
+  for (let i = 0; i < users.length; i += 1) {
+    const user = users[i];
+    results.push({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    });
+  }
+
+  return results;
+}
+
+async function usersPagination() {}
+
 async function getUsers() {
   const users = await usersRepository.getUsers();
 
@@ -170,4 +198,5 @@ module.exports = {
   emailIsRegistered,
   checkPassword,
   changePassword,
+  getUsersWithPagination,
 };

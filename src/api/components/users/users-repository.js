@@ -8,15 +8,20 @@ async function getUsers() {
   return User.find({});
 }
 
-async function getUsersWithPagination(
+async function searchedUsersCount(searchQuery) {
+  return User.countDocuments(searchQuery);
+}
+
+async function getUsersSearchSort(
   searchQuery,
   sortQuery,
   page_number,
   page_size
 ) {
-  return User.find(searchQuery).sort(sortQuery);
-  // .skip((page_number - 1) * page_size)
-  // .limit(page_size);
+  return User.find(searchQuery)
+    .sort(sortQuery)
+    .skip((page_number - 1) * page_size)
+    .limit(page_size);
 }
 
 /**
@@ -100,5 +105,6 @@ module.exports = {
   deleteUser,
   getUserByEmail,
   changePassword,
-  getUsersWithPagination,
+  getUsersSearchSort,
+  searchedUsersCount,
 };

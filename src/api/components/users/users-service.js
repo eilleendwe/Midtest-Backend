@@ -1,17 +1,32 @@
 const usersRepository = require('./users-repository');
 const { hashPassword, passwordMatched } = require('../../../utils/password');
 
-/**
- * Get list of users
- * @returns {Array}
- */
-async function getUsersWithPagination(
-  searchQuery,
-  sortQuery,
-  page_number,
-  page_size
-) {
-  const users = await usersRepository.getUsersWithPagination(
+async function getUsersSearchSort(search, sort, page_number, page_size) {
+  let searchField, searchKey;
+  if (search) {
+    const [field, key] = search.split(':');
+    searchField = field;
+    searchKey = key;
+  }
+
+  let searchQuery = {};
+  if (searchField === 'email') {
+    searchQuery.email = { $regex: searchKey, $options: 'i' };
+  } else if (searchField === 'name') {
+    searchQuery.name = { $regex: searchKey, $options: 'i' };
+  }
+
+  let sortQuery = {};
+  if (sort) {
+    const [sortField, sortOrder] = sort.split(':');
+    if (sortOrder === 'desc') {
+      sortQuery[sortField] = -1;
+    } else {
+      sortQuery[sortField] = 1;
+    }
+  }
+
+  const users = await usersRepository.getUsersSearchSort(
     searchQuery,
     sortQuery,
     page_number,
@@ -28,11 +43,16 @@ async function getUsersWithPagination(
     });
   }
 
-  return results;
+  const jumlahSearchedUsers =
+    await usersRepository.searchedUsersCount(searchQuery);
+
+  return { results, jumlahSearchedUsers };
 }
 
-async function usersPagination() {}
-
+/**
+ * Get list of users
+ * @returns {Array}
+ */
 async function getUsers() {
   const users = await usersRepository.getUsers();
 
@@ -198,5 +218,5 @@ module.exports = {
   emailIsRegistered,
   checkPassword,
   changePassword,
-  getUsersWithPagination,
+  getUsersSearchSort,
 };

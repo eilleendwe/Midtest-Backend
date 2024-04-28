@@ -14,64 +14,35 @@ async function getUsers(request, response, next) {
 
     // nilai default kalau kosong = 1
     const page_number = parseInt(request.query.page_number) || 1;
-    // nilai default kalau kosong = 100
+    // nilai default kalau kosong = semua data yang ada / data yanag di search
     const page_size = parseInt(request.query.page_size) || totalUsers.length;
+    // nilai default kalau kosong = tidak ada
     const search = request.query.search || '';
+    // nilai default kalau kosong = tidak ada, maka diurutkan secara ascending
     const sort = request.query.sort || '';
 
-    let searchField, searchKey;
-    if (search) {
-      const [field, key] = search.split(':');
-      searchField = field;
-      searchKey = key;
-    }
-
-    let searchQuery = {};
-    if (searchField === 'email') {
-      searchQuery.email = { $regex: searchKey, $options: 'i' };
-    } else if (searchField === 'name') {
-      searchQuery.name = { $regex: searchKey, $options: 'i' };
-    }
-
-    let sortQuery = {};
-    if (sort) {
-      const [sortField, sortOrder] = sort.split(':');
-      if (sortOrder === 'desc') {
-        sortQuery[sortField] = -1;
-      } else {
-        sortQuery[sortField] = 1;
-      }
-    }
-
-    const users = await usersService.getUsersWithPagination(
-      searchQuery,
-      sortQuery,
+    const { results } = await usersService.getUsersSearchSort(
+      search,
+      sort,
       page_number,
       page_size
     );
 
-    const indexAwal = (page_number - 1) * page_size;
-    const indexAkhir = page_number * page_size;
+    const { jumlahSearchedUsers } =
+      await usersService.getUsersSearchSort(search);
 
     //pembulatan keatas
-    const total_pages = Math.ceil(users.length / page_size);
-
-    //kalau page_number diatas 1 maka has_previous_page = true
-    const has_previous_page = page_number > 1;
-    //kalau total_pages > page_number maka has_next_page = true
-    const has_next_page = total_pages > page_number;
-
-    const result = users.slice(indexAwal, indexAkhir);
+    const total_pages = Math.ceil(jumlahSearchedUsers / page_size);
 
     return response.status(200).json({
-      // dataSearched: users.length,
       page_number: page_number,
       page_size: page_size,
       count: totalUsers.length,
-      has_previous_page: has_previous_page,
-      has_next_page: has_next_page,
+      has_previous_page: page_number > 1,
+      //kalau total_pages > page_number maka has_next_page = true
+      has_next_page: page_number < total_pages,
       total_pages: total_pages,
-      data: result,
+      data: results,
     });
   } catch (error) {
     return next(error);

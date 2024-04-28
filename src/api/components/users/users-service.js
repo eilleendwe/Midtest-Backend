@@ -32,6 +32,9 @@ async function getUsersSearchSort(search, sort, page_number, page_size) {
     } else {
       sortQuery[sortField] = 1;
     }
+  } else {
+    // sortOrder = 'asc';
+    sortQuery['email'] = 1;
   }
 
   const users = await usersRepository.getUsersSearchSort(

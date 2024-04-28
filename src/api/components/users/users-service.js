@@ -1,6 +1,14 @@
 const usersRepository = require('./users-repository');
 const { hashPassword, passwordMatched } = require('../../../utils/password');
 
+/**
+ * Menghandle list of users yang di search / yang dicari
+ * @param {string} search - yang di cari (email/name)
+ * @param {string} sort - jenis sort yg diinginkan (asc/desc)
+ * @param {string} page_number - page ke berapa
+ * @param {string} page_size - banyak data yang ada dalam 1 halaman
+ * @returns {object} Response object or pass an error to the next route
+ */
 async function getUsersSearchSort(search, sort, page_number, page_size) {
   let searchField, searchKey;
   if (search) {

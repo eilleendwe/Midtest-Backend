@@ -10,6 +10,7 @@ const { errorResponder, errorTypes } = require('../../../core/errors');
  */
 async function getUsers(request, response, next) {
   try {
+    //jumlah semua data user yang ada
     const totalUsers = await usersService.getUsers();
 
     // nilai default kalau kosong = 1
@@ -28,6 +29,7 @@ async function getUsers(request, response, next) {
       page_size
     );
 
+    //jumlah data user yang dicari/searched
     const { jumlahSearchedUsers } =
       await usersService.getUsersSearchSort(search);
 

@@ -19,8 +19,8 @@ async function searchedUsersCount(searchQuery) {
 
 /**
  * Mengandle list of users yang di search dan sort
- * @param {string} search - yang di cari (email/name)
- * @param {string} sort - jenis sort yg diinginkan (asc/desc)
+ * @param {object} searchQuery - yang di cari (email/name)
+ * @param {object} sortQuery - jenis sort yg diinginkan (asc/desc)
  * @param {string} page_number - page ke berapa
  * @param {string} page_size - banyak data yang ada dalam 1 halaman
  * @returns {Promise}

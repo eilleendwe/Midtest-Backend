@@ -33,7 +33,6 @@ async function getUsersSearchSort(search, sort, page_number, page_size) {
       sortQuery[sortField] = 1;
     }
   } else {
-    // sortOrder = 'asc';
     sortQuery['email'] = 1;
   }
 

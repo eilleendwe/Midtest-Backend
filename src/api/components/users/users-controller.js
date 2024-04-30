@@ -39,7 +39,7 @@ async function getUsers(request, response, next) {
     return response.status(200).json({
       page_number: page_number,
       page_size: page_size,
-      count: totalUsers.length,
+      count: jumlahSearchedUsers,
       has_previous_page: page_number > 1,
       //kalau total_pages > page_number maka has_next_page = true
       has_next_page: page_number < total_pages,

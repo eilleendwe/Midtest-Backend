@@ -2,6 +2,9 @@ const authenticationRepository = require('./authentication-repository');
 const { generateToken } = require('../../../utils/session-token');
 const { passwordMatched } = require('../../../utils/password');
 
+const wrongLoginAttempts = {};
+let waktuAttempt = {};
+
 /**
  * Check username and password for login.
  * @param {string} email - Email
@@ -17,6 +20,35 @@ async function checkLoginCredentials(email, password) {
   // guessing login credentials by looking at the processing time.
   const userPassword = user ? user.password : '<RANDOM_PASSWORD_FILLER>';
   const passwordChecked = await passwordMatched(password, userPassword);
+
+  if (!user) {
+    return {
+      message: 'Email tidak terdaftar di dalam database',
+    };
+  }
+
+  if (!passwordChecked) {
+    if (!wrongLoginAttempts[email]) {
+      wrongLoginAttempts[email] = 1;
+    } else {
+      wrongLoginAttempts[email]++;
+      if (wrongLoginAttempts[email] > 3) {
+        // -----------------------------
+        const lastAttemptTime = waktuAttempt[email];
+        if (lastAttemptTime && Date.now() - lastAttemptTime < 60000) {
+          return {
+            message: `Too many failed attempts. Try again in 1 minute. At ${new Date(lastAttemptTime + 60000).toLocaleTimeString()}`,
+          };
+        }
+        wrongLoginAttempts[email] = 1;
+      }
+      waktuAttempt[email] = Date.now();
+    }
+  } else {
+    wrongLoginAttempts[email] = 0;
+    //---------------
+    waktuAttempt[email] = null;
+  }
 
   // Because we always check the password (see above comment), we define the
   // login attempt as successful when the `user` is found (by email) and
@@ -35,4 +67,5 @@ async function checkLoginCredentials(email, password) {
 
 module.exports = {
   checkLoginCredentials,
+  wrongLoginAttempts,
 };

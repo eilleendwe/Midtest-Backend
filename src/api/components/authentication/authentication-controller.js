@@ -19,12 +19,12 @@ async function login(request, response, next) {
     );
 
     if (!loginSuccess) {
+      const attempt = authenticationServices.wrongLoginAttempts[email];
       throw errorResponder(
         errorTypes.INVALID_CREDENTIALS,
-        'Wrong email or password'
+        `Wrong email or password. Attempt ke-${attempt}`
       );
     }
-
     return response.status(200).json(loginSuccess);
   } catch (error) {
     return next(error);

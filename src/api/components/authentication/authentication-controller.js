@@ -1,5 +1,7 @@
 const { errorResponder, errorTypes } = require('../../../core/errors');
 const authenticationServices = require('./authentication-service');
+const { loginLimiter } = require('./authentication-service');
+const { loginAttempts } = require('./authentication-service');
 
 /**
  * Handle login request
@@ -21,9 +23,10 @@ async function login(request, response, next) {
     if (!loginSuccess) {
       throw errorResponder(
         errorTypes.INVALID_CREDENTIALS,
-        'Wrong email or password'
+        `Wrong email or password. Attempt = ${loginAttempts[email]}`
       );
     }
+    loginAttempts[email] = 0;
 
     return response.status(200).json(loginSuccess);
   } catch (error) {
@@ -33,4 +36,5 @@ async function login(request, response, next) {
 
 module.exports = {
   login,
+  loginLimiter,
 };

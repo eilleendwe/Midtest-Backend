@@ -32,12 +32,13 @@ async function checkLoginCredentials(email, password) {
       wrongLoginAttempts[email] = 1;
     } else {
       wrongLoginAttempts[email]++;
-      if (wrongLoginAttempts[email] > 3) {
+      if (wrongLoginAttempts[email] > 5) {
         // -----------------------------
         const lastAttemptTime = waktuAttempt[email];
-        if (lastAttemptTime && Date.now() - lastAttemptTime < 60000) {
+        if (lastAttemptTime && Date.now() - lastAttemptTime < 1800000) {
+          const waktu = new Date();
           return {
-            message: `Too many failed attempts. Try again in 1 minute. At ${new Date(lastAttemptTime + 60000).toLocaleTimeString()}`,
+            message: `[${waktu.toLocaleTimeString()}] Too many failed attempts. Try again in 30 minutes. At ${new Date(lastAttemptTime + 1800000).toLocaleTimeString()}`,
           };
         }
         wrongLoginAttempts[email] = 1;
@@ -50,7 +51,7 @@ async function checkLoginCredentials(email, password) {
     const lastSuccessfulLoginTime = waktuAttempt[email];
     if (
       lastSuccessfulLoginTime &&
-      Date.now() - lastSuccessfulLoginTime < 60000
+      Date.now() - lastSuccessfulLoginTime < 1800000
     ) {
       return {
         message: 'You are still locked out. Please try again later.',

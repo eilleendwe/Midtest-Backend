@@ -3,7 +3,7 @@ const { generateToken } = require('../../../utils/session-token');
 const { passwordMatched } = require('../../../utils/password');
 
 const wrongLoginAttempts = {};
-let waktuAttempt = {};
+const waktuAttempt = {};
 
 /**
  * Check username and password for login.
@@ -46,14 +46,25 @@ async function checkLoginCredentials(email, password) {
     }
   } else {
     wrongLoginAttempts[email] = 0;
-    //---------------
-    waktuAttempt[email] = null;
+    // mengecek apakah user ada pernah login tetapi memasukkan password yang benar selama masa 30 menit saat akun di kunci.
+    const lastSuccessfulLoginTime = waktuAttempt[email];
+    if (
+      lastSuccessfulLoginTime &&
+      Date.now() - lastSuccessfulLoginTime < 60000
+    ) {
+      return {
+        message: 'You are still locked out. Please try again later.',
+      };
+    }
   }
 
   // Because we always check the password (see above comment), we define the
   // login attempt as successful when the `user` is found (by email) and
   // the password matches.
   if (user && passwordChecked) {
+    wrongLoginAttempts[email] = 0;
+    //---------------
+    waktuAttempt[email] = null;
     return {
       email: user.email,
       name: user.name,

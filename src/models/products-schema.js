@@ -1,8 +1,8 @@
 const productsSchema = {
-  productId: { type: String, required: true, unique: true },
-  title: { type: String, required: true },
-  description: String,
-  price: { type: Number, required: true },
+  name: String,
+  category: String,
+  price: Number,
+  quantity: Number,
 };
 
 module.exports = productsSchema;

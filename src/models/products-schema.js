@@ -1,6 +1,5 @@
 const productsSchema = {
-  name: String,
-  category: String,
+  productName: String,
   price: Number,
   quantity: Number,
 };

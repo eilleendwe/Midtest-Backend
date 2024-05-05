@@ -1,14 +1,9 @@
-// const { customerId } = require('./customers-schema');
-
 const ordersSchema = {
-  orderId: { type: String, required: true, unique: true },
-  products: [
-    {
-      productId: String,
-      quantity: Number,
-    },
-  ],
-  date: Date,
+  custName: String,
+  productName: String,
+  price: Number,
+  quantity: Number,
+  address: String,
 };
 
 module.exports = ordersSchema;

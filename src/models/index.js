@@ -4,7 +4,6 @@ const logger = require('../core/logger')('app');
 
 const usersSchema = require('./users-schema');
 const productsSchema = require('./products-schema');
-const customersSchema = require('./customers-schema');
 const ordersSchema = require('./orders-schema');
 const failedAttemptsSchema = require('./failed-attempt-schema');
 
@@ -24,7 +23,6 @@ const failedAttempt = mongoose.model(
 );
 
 const Product = mongoose.model('products', mongoose.Schema(productsSchema));
-const Customer = mongoose.model('customers', mongoose.Schema(customersSchema));
 const Order = mongoose.model('orders', mongoose.Schema(ordersSchema));
 
 module.exports = {
@@ -32,6 +30,5 @@ module.exports = {
   User,
   failedAttempt,
   Product,
-  Customer,
   Order,
 };

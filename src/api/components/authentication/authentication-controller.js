@@ -18,11 +18,14 @@ async function login(request, response, next) {
       password
     );
 
-    if (!loginSuccess) {
-      const attempt = authenticationServices.wrongLoginAttempts[email];
+    if (loginSuccess.success == false && loginSuccess.message === 'LOCKED') {
+      return response.status(403).json({
+        message: `Your account is still locked.`,
+      });
+    } else if (loginSuccess.success == false) {
       throw errorResponder(
         errorTypes.INVALID_CREDENTIALS,
-        `Wrong email or password. Attempt ke-${attempt}`
+        `Wrong email or password. Attempt ke ${loginSuccess.message}`
       );
     }
     return response.status(200).json(loginSuccess);

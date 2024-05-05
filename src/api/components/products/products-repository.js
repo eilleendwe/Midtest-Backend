@@ -1,4 +1,4 @@
-const { Product } = require('../../../models/index');
+const { Product, Order } = require('../../../models');
 
 /**
  * Get a list of Products
@@ -6,6 +6,14 @@ const { Product } = require('../../../models/index');
  */
 async function getProducts() {
   return Product.find({});
+}
+
+async function createOrder(newOrder) {
+  return Order.create(newOrder);
+}
+
+async function getProductByName(productName) {
+  return Product.findOne({ productName });
 }
 
 /**
@@ -20,14 +28,12 @@ async function getProduct(id) {
 /**
  * Create new product
  * @param {string} name - product name
- * @param {string} category - product category
  * @param {string} price - product price
  * @returns {Promise}
  */
-async function createProduct(name, category, price, quantity) {
+async function createProduct(productName, price, quantity) {
   return Product.create({
-    name,
-    category,
+    productName,
     price,
     quantity,
   });
@@ -37,21 +43,19 @@ async function createProduct(name, category, price, quantity) {
  * Update existing product
  * @param {string} id - product ID
  * @param {string} name - product name
- * @param {string} category - product category
  * @param {string} price - product price
  * @returns {Promise}
  */
-async function updateProduct(id, name, category, price, quantity) {
-  return Product.updateOne(
+async function updateProduct(id, productName, price, quantity) {
+  return Product.findOneAndUpdate(
     {
       _id: id,
     },
     {
       $set: {
-        name,
-        category,
-        price,
-        quantity,
+        productName: productName,
+        price: price,
+        quantity: quantity,
       },
     }
   );
@@ -103,4 +107,6 @@ module.exports = {
   deleteProduct,
   searchedProductsCount,
   getProductsSearchSort,
+  getProductByName,
+  createOrder,
 };

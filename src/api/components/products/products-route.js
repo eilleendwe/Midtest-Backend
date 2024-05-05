@@ -21,6 +21,13 @@ module.exports = (app) => {
     productsControllers.createProduct
   );
 
+  route.post(
+    '/orders',
+    authenticationMiddleware,
+    celebrate(productsValidator.createOrder),
+    productsControllers.createOrder
+  );
+
   // Get product detail
   route.get('/:id', authenticationMiddleware, productsControllers.getProduct);
 

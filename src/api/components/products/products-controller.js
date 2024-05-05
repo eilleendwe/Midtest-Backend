@@ -1,6 +1,50 @@
 const productsService = require('./products-service');
 const { errorResponder, errorTypes } = require('../../../core/errors');
 
+async function createOrder(request, response, next) {
+  try {
+    const custName = request.body.customerName;
+    const productName = request.body.productName;
+    const price = request.body.price;
+    const quantity = request.body.quantity;
+    const address = request.body.address;
+
+    // Cek apakah produk ada?
+    const productExist = await productsService.isProductExist(productName);
+
+    if (!productExist) {
+      throw errorResponder(errorTypes.NOT_FOUND, 'Product not found');
+    }
+    if (productExist.quantity < quantity) {
+      throw errorResponder(
+        errorTypes.UNPROCESSABLE_ENTITY,
+        'Insufficient product quantity'
+      );
+    }
+
+    // Update the product quantity
+    await productsService.updateProduct(
+      productExist._id,
+      productExist.productName,
+      productExist.price,
+      productExist.quantity - quantity
+    );
+
+    // Save the order
+    const savedOrder = await productsService.createOrder(
+      custName,
+      productName,
+      price,
+      quantity,
+      address
+    );
+
+    return response.status(201).json(savedOrder);
+  } catch (error) {
+    return next(error);
+  }
+}
+
 /**
  * Handle get list of products request
  * @param {object} request - Express request object
@@ -60,7 +104,7 @@ async function getProducts(request, response, next) {
  */
 async function getProduct(request, response, next) {
   try {
-    const product = await productsService.getProduct(request.params.productId);
+    const product = await productsService.getProduct(request.params.id);
 
     if (!product) {
       throw errorResponder(errorTypes.UNPROCESSABLE_ENTITY, 'Unknown product');
@@ -81,14 +125,12 @@ async function getProduct(request, response, next) {
  */
 async function createProduct(request, response, next) {
   try {
-    const name = request.body.name;
-    const category = request.body.category;
+    const productName = request.body.productName;
     const price = request.body.price;
     const quantity = request.body.quantity;
 
     const success = await productsService.createProduct(
-      name,
-      category,
+      productName,
       price,
       quantity
     );
@@ -99,7 +141,7 @@ async function createProduct(request, response, next) {
       );
     }
 
-    return response.status(200).json({ name, category, price, quantity });
+    return response.status(200).json({ productName, price, quantity });
   } catch (error) {
     return next(error);
   }
@@ -115,15 +157,13 @@ async function createProduct(request, response, next) {
 async function updateProduct(request, response, next) {
   try {
     const id = request.params.id;
-    const name = request.body.name;
-    const category = request.body.category;
+    const productName = request.body.productName;
     const price = request.body.price;
     const quantity = request.body.quantity;
 
     const success = await productsService.updateProduct(
       id,
-      name,
-      category,
+      productName,
       price,
       quantity
     );
@@ -136,7 +176,7 @@ async function updateProduct(request, response, next) {
 
     return response
       .status(200)
-      .json({ message: `Product ${name} has been updated` });
+      .json({ message: `Product ${productName} has been updated` });
   } catch (error) {
     return next(error);
   }
@@ -173,4 +213,5 @@ module.exports = {
   createProduct,
   updateProduct,
   deleteProduct,
+  createOrder,
 };

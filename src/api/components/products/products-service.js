@@ -1,5 +1,45 @@
 const productsRepository = require('./products-repository');
 
+async function isProductExist(productName) {
+  const product = await productsRepository.getProductByName(productName);
+
+  if (product) {
+    return true;
+  }
+
+  return false;
+}
+
+async function createOrder(custName, productName, price, quantity, address) {
+  // Check if the product exists
+  const product = await productsRepository.getProductByName(productName);
+  if (!product) {
+    throw new Error('Product not found');
+  }
+  if (product.quantity < quantity) {
+    throw new Error('Insufficient product quantity');
+  }
+
+  // Update the product quantity
+  await productsRepository.updateProduct(
+    product._id,
+    product.name,
+    product.price,
+    product.quantity - quantity
+  );
+
+  // Create new order
+  const newOrder = await productsRepository.createOrder({
+    custName,
+    productName,
+    price,
+    quantity,
+    address,
+  });
+
+  return newOrder;
+}
+
 /**
  * Menghandle list of users yang di search / yang dicari
  * @param {string} search - yang di cari (email/name)
@@ -17,10 +57,8 @@ async function getProductsSearchSort(search, sort, page_number, page_size) {
   }
 
   let searchQuery = {};
-  if (searchField === 'name') {
-    searchQuery.name = { $regex: searchKey, $options: 'i' };
-  } else if (searchField === 'category') {
-    searchQuery.category = { $regex: searchKey, $options: 'i' };
+  if (searchField === 'productName') {
+    searchQuery.productName = { $regex: searchKey, $options: 'i' };
   }
 
   let sortQuery = {};
@@ -32,7 +70,7 @@ async function getProductsSearchSort(search, sort, page_number, page_size) {
       sortQuery[sortField] = 1;
     }
   } else {
-    sortQuery['name'] = 1;
+    sortQuery['productName'] = 1;
   }
 
   const products = await productsRepository.getProductsSearchSort(
@@ -47,8 +85,7 @@ async function getProductsSearchSort(search, sort, page_number, page_size) {
     const product = products[i];
     results.push({
       id: product.id,
-      name: product.name,
-      category: product.category,
+      productName: product.productName,
       price: product.price,
       quantity: product.quantity,
     });
@@ -72,8 +109,7 @@ async function getProducts() {
     const product = products[i];
     results.push({
       id: product.id,
-      name: product.name,
-      category: product.category,
+      productName: product.productName,
       price: product.price,
       quantity: product.quantity,
     });
@@ -87,7 +123,7 @@ async function getProducts() {
  * @returns {Object}
  */
 async function getProduct(id) {
-  const product = await productsRepository.getproduct(id);
+  const product = await productsRepository.getProduct(id);
 
   // product not found
   if (!product) {
@@ -96,8 +132,7 @@ async function getProduct(id) {
 
   return {
     id: product.id,
-    name: product.name,
-    category: product.category,
+    productName: product.productName,
     price: product.price,
     quantity: product.quantity,
   };
@@ -106,13 +141,12 @@ async function getProduct(id) {
 /**
  * Create product
  * @param {string} name - product name
- * @param {string} category - product category
  * @param {string} price - product price
  * @returns {boolean}
  */
-async function createProduct(name, category, price, quantity) {
+async function createProduct(productName, price, quantity) {
   try {
-    await productsRepository.createProduct(name, category, price, quantity);
+    await productsRepository.createProduct(productName, price, quantity);
   } catch (err) {
     return null;
   }
@@ -123,11 +157,10 @@ async function createProduct(name, category, price, quantity) {
  * Update existing product
  * @param {string} id - product ID
  * @param {string} name - product name
- * @param {string} category - product category
  * @param {string} price - product price
  * @returns {boolean}
  */
-async function updateProduct(id, name, category, price, quantity) {
+async function updateProduct(id, productName, price, quantity) {
   const product = await productsRepository.getProduct(id);
 
   // User not found
@@ -136,7 +169,7 @@ async function updateProduct(id, name, category, price, quantity) {
   }
 
   try {
-    await productsRepository.updateProduct(id, name, category, price, quantity);
+    await productsRepository.updateProduct(id, productName, price, quantity);
   } catch (err) {
     return null;
   }
@@ -173,4 +206,6 @@ module.exports = {
   updateProduct,
   deleteProduct,
   getProductsSearchSort,
+  isProductExist,
+  createOrder,
 };

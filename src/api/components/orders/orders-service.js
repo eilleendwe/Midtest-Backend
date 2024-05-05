@@ -1,4 +1,3 @@
-const { custName } = require('../../../models/orders-schema');
 const ordersRepository = require('./orders-repository');
 
 /**

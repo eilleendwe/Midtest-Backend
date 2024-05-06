@@ -2,7 +2,7 @@ const authenticationRepository = require('./authentication-repository');
 const { generateToken } = require('../../../utils/session-token');
 const { passwordMatched } = require('../../../utils/password');
 
-const lockedTime = 60 * 1000;
+const lockedTime = 30 * 60 * 1000;
 let lastFailedAttepmptTime;
 
 /**

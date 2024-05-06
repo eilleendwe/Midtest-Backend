@@ -1,6 +1,13 @@
 const productsService = require('./products-service');
 const { errorResponder, errorTypes } = require('../../../core/errors');
 
+/**
+ * Create order
+ * @param {object} request - Express request object
+ * @param {object} response - Express response object
+ * @param {object} next - Express route middlewares
+ * @returns {object} Response object or pass an error to the next route
+ */
 async function createOrder(request, response, next) {
   try {
     const custName = request.body.customerName;

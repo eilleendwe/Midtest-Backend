@@ -1,5 +1,5 @@
 const { User, failedAttempt } = require('../../../models');
-const lockedTime = 60 * 1000; // 1 menit
+const lockedTime = 30 * 60 * 1000; // 30 menit
 /**
  * Get user by email for login information
  * @param {string} email - Email
@@ -9,10 +9,20 @@ async function getUserByEmail(email) {
   return User.findOne({ email });
 }
 
+/**
+ * Get failed login attempt untuk setiap email
+ * @param {string} email - Email
+ * @returns {Promise}
+ */
 async function getFailedLoginAttempts(email) {
   return failedAttempt.findOne({ email });
 }
 
+/**
+ * Untuk mereset failed attempt per user
+ * @param {string} email - Email
+ * @returns {Promise}
+ */
 async function resetFailedAttempts(email) {
   await failedAttempt.findOneAndUpdate(
     { email }, //kriteria cari
@@ -21,6 +31,11 @@ async function resetFailedAttempts(email) {
   );
 }
 
+/**
+ * Untuk mengupdate failed attempt per user
+ * @param {string} email - Email
+ * @returns {Promise}
+ */
 async function updateFailedAttempts(email) {
   await failedAttempt.findOneAndUpdate(
     { email },
@@ -34,6 +49,11 @@ async function updateFailedAttempts(email) {
   );
 }
 
+/**
+ * Untuk mengecek apakah account masih kekunci dalam batas waktu atau tidak
+ * @param {string} email - Email
+ * @returns {boolean}
+ */
 async function isAccountLocked(email) {
   const attempt = await failedAttempt.findOne({ email });
   if (attempt && attempt.failedAttempt > 5) {

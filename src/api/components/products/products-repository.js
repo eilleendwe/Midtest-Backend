@@ -8,10 +8,20 @@ async function getProducts() {
   return Product.find({});
 }
 
+/**
+ * Create order
+ * @param {object} newOrder - object order baru
+ * @returns {Promise}
+ */
 async function createOrder(newOrder) {
   return Order.create(newOrder);
 }
 
+/**
+ * Get a product by name
+ * @param {string} productName - product name
+ * @returns {Promise}
+ */
 async function getProductByName(productName) {
   return Product.findOne({ productName });
 }
@@ -27,8 +37,9 @@ async function getProduct(id) {
 
 /**
  * Create new product
- * @param {string} name - product name
- * @param {string} price - product price
+ * @param {string} productName - product name
+ * @param {number} price - product price
+ * @param {number} quantity - product quantity
  * @returns {Promise}
  */
 async function createProduct(productName, price, quantity) {
@@ -42,8 +53,9 @@ async function createProduct(productName, price, quantity) {
 /**
  * Update existing product
  * @param {string} id - product ID
- * @param {string} name - product name
- * @param {string} price - product price
+ * @param {string} productName - product name
+ * @param {number} price - product price
+ * @param {number} quantity - product quantity
  * @returns {Promise}
  */
 async function updateProduct(id, productName, price, quantity) {

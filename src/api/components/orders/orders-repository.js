@@ -19,9 +19,11 @@ async function getOrder(id) {
 
 /**
  * Update existing order
- * @param {string} id - order ID
+ * @param {string} id - order id
+ * @param {string} custName - customer name
  * @param {string} productName - product name
- * @param {string} price - product price
+ * @param {number} price - product price
+ * @param {number} quantity - quantity
  * @returns {Promise}
  */
 async function updateOrder(id, custName, productName, price, quantity) {
@@ -42,7 +44,7 @@ async function updateOrder(id, custName, productName, price, quantity) {
 
 /**
  * Delete an order
- * @param {string} orderId - order ID
+ * @param {string} id - order ID
  * @returns {Promise}
  */
 async function deleteOrder(id) {
@@ -62,8 +64,8 @@ async function searchedOrdersCount(searchQuery) {
  * Handle a list of orders that are searched and sorted
  * @param {object} searchQuery - what is being searched (email/name)
  * @param {object} sortQuery - desired sort type (asc/desc)
- * @param {string} page_number - which page
- * @param {string} page_size - how many data in 1 page
+ * @param {number} page_number - which page
+ * @param {number} page_size - how many data in 1 page
  * @returns {Promise}
  */
 async function getOrdersSearchSort(

@@ -1,5 +1,9 @@
 const productsRepository = require('./products-repository');
-
+/**
+ * Mengeceka apakah product ada di db
+ * @param {string} productName - product name
+ * @returns {boolean}
+ */
 async function isProductExist(productName) {
   const product = await productsRepository.getProductByName(productName);
 
@@ -10,6 +14,15 @@ async function isProductExist(productName) {
   return false;
 }
 
+/**
+ * Membuat order baru
+ * @param {string} custName - order ID
+ * @param {string} productName - product name
+ * @param {number} price - order price
+ * @param {number} quantity - order quantity
+ * @param {string} address - customer address
+ * @returns {object}
+ */
 async function createOrder(custName, productName, price, quantity, address) {
   // Check if the product exists
   const product = await productsRepository.getProductByName(productName);
@@ -44,8 +57,8 @@ async function createOrder(custName, productName, price, quantity, address) {
  * Menghandle list of users yang di search / yang dicari
  * @param {string} search - yang di cari (email/name)
  * @param {string} sort - jenis sort yg diinginkan (asc/desc)
- * @param {string} page_number - page ke berapa
- * @param {string} page_size - banyak data yang ada dalam 1 halaman
+ * @param {number} page_number - page ke berapa
+ * @param {number} page_size - banyak data yang ada dalam 1 halaman
  * @returns {object} Response object or pass an error to the next route
  */
 async function getProductsSearchSort(search, sort, page_number, page_size) {
@@ -119,7 +132,7 @@ async function getProducts() {
 
 /**
  * Get product detail
- * @param {string} productId - product ID
+ * @param {string} id - product ID
  * @returns {Object}
  */
 async function getProduct(id) {
@@ -140,8 +153,9 @@ async function getProduct(id) {
 
 /**
  * Create product
- * @param {string} name - product name
- * @param {string} price - product price
+ * @param {string} productName - product name
+ * @param {number} price - product price
+ * @param {number} quantity - product quantity
  * @returns {boolean}
  */
 async function createProduct(productName, price, quantity) {
@@ -156,8 +170,9 @@ async function createProduct(productName, price, quantity) {
 /**
  * Update existing product
  * @param {string} id - product ID
- * @param {string} name - product name
- * @param {string} price - product price
+ * @param {string} productName - product name
+ * @param {number} price - product price
+ * @param {number} quantity - product quantity
  * @returns {boolean}
  */
 async function updateProduct(id, productName, price, quantity) {
@@ -179,7 +194,7 @@ async function updateProduct(id, productName, price, quantity) {
 
 /**
  * Delete product
- * @param {string} productId - User ID
+ * @param {string} id - User ID
  * @returns {boolean}
  */
 async function deleteProduct(id) {

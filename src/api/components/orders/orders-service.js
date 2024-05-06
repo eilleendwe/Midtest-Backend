@@ -4,8 +4,8 @@ const ordersRepository = require('./orders-repository');
  * Menghandle list of orders yang di search / yang dicari
  * @param {string} search - yang di cari (email/name)
  * @param {string} sort - jenis sort yg diinginkan (asc/desc)
- * @param {string} page_number - page ke berapa
- * @param {string} page_size - banyak data yang ada dalam 1 halaman
+ * @param {number} page_number - page ke berapa
+ * @param {number} page_size - banyak data yang ada dalam 1 halaman
  * @returns {object} Response object or pass an error to the next route
  */
 async function getOrdersSearchSort(search, sort, page_number, page_size) {
@@ -81,7 +81,7 @@ async function getOrders() {
 
 /**
  * Get order detail
- * @param {string} orderId - order ID
+ * @param {string} id - order ID
  * @returns {Object}
  */
 async function getOrder(id) {
@@ -104,8 +104,9 @@ async function getOrder(id) {
 /**
  * Update existing order
  * @param {string} id - order ID
- * @param {string} name - order name
- * @param {string} price - order price
+ * @param {string} productName - product name
+ * @param {number} price - order price
+ * @param {number} quantity - order price
  * @returns {boolean}
  */
 async function updateOrder(id, productName, price, quantity) {
@@ -127,7 +128,7 @@ async function updateOrder(id, productName, price, quantity) {
 
 /**
  * Delete order
- * @param {string} orderId - Order ID
+ * @param {string} id - Order ID
  * @returns {boolean}
  */
 async function deleteOrder(id) {
